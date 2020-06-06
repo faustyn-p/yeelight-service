@@ -27,14 +27,12 @@ export class YeelightService implements IYeelight {
 		multicastAddr: string;
 		discoveryMsg: string;
 	} = {
-			port: 1982,
-			multicastAddr: '239.255.255.250',
-			discoveryMsg: 'M-SEARCH * HTTP/1.1\r\nMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n',
-		};
+		port: 1982,
+		multicastAddr: '239.255.255.250',
+		discoveryMsg: 'M-SEARCH * HTTP/1.1\r\nMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n',
+	};
 
-	public devices: BehaviorSubject<BehaviorSubject<IYeelightDevice>[]> = new BehaviorSubject<
-		BehaviorSubject<IYeelightDevice>[]
-	>([]);
+	public devices: BehaviorSubject<BehaviorSubject<IYeelightDevice>[]> = new BehaviorSubject<BehaviorSubject<IYeelightDevice>[]>([]);
 
 	constructor(private readonly yeelightMethods: YeelightMethods = new YeelightMethods()) {
 		this.listen();
@@ -62,7 +60,7 @@ export class YeelightService implements IYeelight {
 
 	private sendMessage(message: string, address: string): void {
 		const buffer = Buffer.from(message);
-		this.socket.send(buffer, 0, buffer.length, this.options.port, address, (err, bytes) => {
+		this.socket.send(buffer, 0, buffer.length, this.options.port, address, (err) => {
 			if (err) {
 				throw err;
 			}
@@ -147,32 +145,22 @@ export class YeelightService implements IYeelight {
 		device.set = {
 			name: (name: string) => this.yeelightMethods.setName(device, name),
 			asDefault: () => this.yeelightMethods.setDefault(device),
-			power: (powerState: YeelightPowerState, effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setPower(device, powerState, effect, duration),
-			colorTemperature: (colorTemperature: number, effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setTemperature(device, colorTemperature, effect, duration),
-			rgb: (rgb: string | number | number[], effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setRgb(device, rgb, effect, duration),
-			hsv: (hue: number, saturation: number, effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setHsv(device, hue, saturation, effect, duration),
-			brightness: (brightness: number, effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setBrightness(device, brightness, effect, duration),
+			power: (powerState: YeelightPowerState, effect: YeelightEffect, duration: number) => this.yeelightMethods.setPower(device, powerState, effect, duration),
+			colorTemperature: (colorTemperature: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setTemperature(device, colorTemperature, effect, duration),
+			rgb: (rgb: string | number | number[], effect: YeelightEffect, duration: number) => this.yeelightMethods.setRgb(device, rgb, effect, duration),
+			hsv: (hue: number, saturation: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setHsv(device, hue, saturation, effect, duration),
+			brightness: (brightness: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, brightness, effect, duration),
 		};
 
 		device.togglePower = () => this.yeelightMethods.toggle(device);
 
 		device.adjust = {
-			brightness: (difference: number, effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setBrightness(device, difference, effect, duration),
-			temperature: (difference: number, effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setBrightness(device, difference, effect, duration),
-			color: (difference: number, effect: YeelightEffect, duration: number) =>
-				this.yeelightMethods.setBrightness(device, difference, effect, duration),
+			brightness: (difference: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, difference, effect, duration),
+			temperature: (difference: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, difference, effect, duration),
+			color: (difference: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, difference, effect, duration),
 		};
 
-		const deviceIndex: number = this.devices?.value.findIndex(
-			(registeredDevice: BehaviorSubject<IYeelightDevice>) => registeredDevice.value.id === device.id,
-		);
+		const deviceIndex: number = this.devices?.value.findIndex((registeredDevice: BehaviorSubject<IYeelightDevice>) => registeredDevice.value.id === device.id,);
 
 		if (deviceIndex >= 0) {
 			return;
