@@ -183,7 +183,7 @@ supportedMethods: YeelightSupportedMethodsEnum[];
 ```
 
 ### More information
-For more information check out `yeelight.interface.ts` file.
+For more information check out [`yeelight.interface.ts`](https://github.com/faustyn-p/yeelight-service/blob/master/src/yeelight.interface.ts) file.
 
 ## Contributing
 
