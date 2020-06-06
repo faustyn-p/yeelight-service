@@ -284,7 +284,7 @@ export interface IYeelightMethods {
 	 * @param {YeelightEffect} effect Optional parameter with effect - `smooth` or `sudden`
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
-	 */	
+	 */
 	adjustTemperature: (device: IYeelightDevice,difference: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
 
 	/**
@@ -296,7 +296,7 @@ export interface IYeelightMethods {
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
 	adjustColor: (device: IYeelightDevice,difference: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
-	
+
 	/**
 	 * Send custom command supported by the device (https://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf)
 	 * @param {IYeelightDevice} device Yeelight device
