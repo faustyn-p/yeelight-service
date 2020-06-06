@@ -98,11 +98,7 @@ export interface IYeelightDevice {
 		 * @param {number} duration Optional parameter with duration (in ms)
 		 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 		 */
-		colorTemperature: (
-			colorTemperature: number,
-			effect?: YeelightEffect,
-			duration?: number,
-		) => Promise<IYeelightMethodResponse>;
+		colorTemperature: (colorTemperature: number, effect?: YeelightEffect, duration?: number) => Promise<IYeelightMethodResponse>;
 
 		/**
 		 * Set RGB color of the device
@@ -111,11 +107,7 @@ export interface IYeelightDevice {
 		 * @param {number} duration Optional parameter with duration (in ms)
 		 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 		 */
-		rgb: (
-			rgb: string | number | number[],
-			effect?: YeelightEffect,
-			duration?: number,
-		) => Promise<IYeelightMethodResponse>;
+		rgb: (rgb: string | number | number[], effect?: YeelightEffect, duration?: number) => Promise<IYeelightMethodResponse>;
 
 		/**
 		 * Set hue and saturation of the device
@@ -125,12 +117,7 @@ export interface IYeelightDevice {
 		 * @param {number} duration Optional parameter with duration (in ms)
 		 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 		 */
-		hsv: (
-			hue: number,
-			saturation: number,
-			effect?: YeelightEffect,
-			duration?: number,
-		) => Promise<IYeelightMethodResponse>;
+		hsv: (hue: number, saturation: number, effect?: YeelightEffect, duration?: number) => Promise<IYeelightMethodResponse>;
 
 		/**
 		 * Set brightness of the device
@@ -215,12 +202,7 @@ export interface IYeelightMethods {
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	setPower: (
-		device: IYeelightDevice,
-		power: YeelightPowerState,
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
+	setPower: (device: IYeelightDevice,power: YeelightPowerState,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>;
 
 	/**
 	 * Set color temperature of the device
@@ -230,12 +212,7 @@ export interface IYeelightMethods {
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	setTemperature: (
-		device: IYeelightDevice,
-		colorTemperature: number,
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
+	setTemperature: (device: IYeelightDevice,colorTemperature: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Set RGB color of the device
@@ -245,12 +222,7 @@ export interface IYeelightMethods {
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	setRgb: (
-		device: IYeelightDevice,
-		rgb: string | number | number[],
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
+	setRgb: (device: IYeelightDevice,rgb: string | number | number[],effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Set hue and saturation of the device
@@ -261,13 +233,7 @@ export interface IYeelightMethods {
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	setHsv: (
-		device: IYeelightDevice,
-		hue: number,
-		saturation: number,
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
+	setHsv: (device: IYeelightDevice,hue: number,saturation: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Set brightness of the device
@@ -277,19 +243,14 @@ export interface IYeelightMethods {
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	setBrightness: (
-		device: IYeelightDevice,
-		brightness: number,
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
+	setBrightness: (device: IYeelightDevice,brightness: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Set device state as default
 	 * @param {IYeelightDevice} device Yeelight device
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	setDefault: (device: IYeelightDevice) => Promise<IYeelightMethodResponse>;
+	setDefault: (device: IYeelightDevice,) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Set name of the device
@@ -297,14 +258,14 @@ export interface IYeelightMethods {
 	 * @param {string} name New friendly-name of the device
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	setName: (device: IYeelightDevice, name: string) => Promise<IYeelightMethodResponse>;
+	setName: (device: IYeelightDevice,name: string,) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Toggle selected device power state.
 	 * @param {IYeelightDevice} device Yeelight device
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	toggle: (device: IYeelightDevice) => Promise<IYeelightMethodResponse>;
+	toggle: (device: IYeelightDevice) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Adjust brightness of the device
@@ -314,12 +275,7 @@ export interface IYeelightMethods {
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	adjustBrightness: (
-		device: IYeelightDevice,
-		difference: number,
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
+	adjustBrightness: (device: IYeelightDevice,difference: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Adjust color temperature of the device
@@ -328,14 +284,8 @@ export interface IYeelightMethods {
 	 * @param {YeelightEffect} effect Optional parameter with effect - `smooth` or `sudden`
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
-	 */
-
-	adjustTemperature: (
-		device: IYeelightDevice,
-		difference: number,
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
+	 */	
+	adjustTemperature: (device: IYeelightDevice,difference: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
 
 	/**
 	 * Adjust color of the device
@@ -345,24 +295,15 @@ export interface IYeelightMethods {
 	 * @param {number} duration Optional parameter with duration (in ms)
 	 * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
 	 */
-	adjustColor: (
-		device: IYeelightDevice,
-		difference: number,
-		effect: YeelightEffect,
-		duration: number,
-	) => Promise<IYeelightMethodResponse>;
-
+	adjustColor: (device: IYeelightDevice,difference: number,effect: YeelightEffect,duration: number) => Promise<IYeelightMethodResponse>
+	
 	/**
 	 * Send custom command supported by the device (https://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf)
 	 * @param {IYeelightDevice} device Yeelight device
 	 * @param {id: number, method: string, params: TYeelightParams} command Command that should be send to device.
 	 * @param {(response: IYeelightMethodResponse) => void} callback Callback after operation finished
 	 */
-	sendCommand: (
-		device: IYeelightDevice,
-		command: { id: number; method: string; params: TYeelightParams },
-		callback: (response: IYeelightMethodResponse) => void,
-	) => void;
+	sendCommand: (device: IYeelightDevice, command: { id: number, method: string, params: TYeelightParams }, callback: (response: IYeelightMethodResponse) => void) => void
 }
 
 export interface IYeelightMethodResponse {
