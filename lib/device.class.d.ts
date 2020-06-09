@@ -1,0 +1,43 @@
+import { BehaviorSubject } from "rxjs";
+import { YeelightDeviceModelEnum, YeelightSupportedMethodsEnum, YeelightPowerState, YeelightColorModeEnum, IYeelightMethodResponse, YeelightEffect, TYeelightParams, IYeelightDevice } from "./yeelight.interface";
+export declare class YeelightDevice implements IYeelightDevice {
+    private readonly defaults;
+    connected: BehaviorSubject<boolean>;
+    private readonly socket;
+    id: string;
+    model: YeelightDeviceModelEnum;
+    supportedMethods: YeelightSupportedMethodsEnum[];
+    name: BehaviorSubject<string>;
+    power: BehaviorSubject<YeelightPowerState>;
+    brightness: BehaviorSubject<number>;
+    colorTemperature: BehaviorSubject<number>;
+    rgb: BehaviorSubject<string>;
+    hue: BehaviorSubject<number>;
+    saturation: BehaviorSubject<number>;
+    colorMode: BehaviorSubject<YeelightColorModeEnum>;
+    constructor(host: string, port: number);
+    destroy(): void;
+    setName(name: string): Promise<IYeelightMethodResponse>;
+    setAsDefault(): Promise<IYeelightMethodResponse>;
+    togglePower(): Promise<IYeelightMethodResponse>;
+    setPower(powerState: YeelightPowerState, effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    setColorTemperature(colorTemperature: number, effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    setRgb(rgb: string | number | number[], effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    setHsv(hue: number, saturation: number, effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    setBrightness(brightness: number, effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    adjustBrightness(difference: number, effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    adjustTemperature(difference: number, effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    adjustColor(difference: number, effect?: YeelightEffect, duration?: number): Promise<IYeelightMethodResponse>;
+    private isDurationValid;
+    private isEffectValid;
+    private handleSocketMessage;
+    private handleProperties;
+    private castMethod;
+    sendCommand(command: {
+        id: number;
+        method: string;
+        params: TYeelightParams;
+    }): Promise<IYeelightMethodResponse>;
+    private setResponse;
+    private throwError;
+}
