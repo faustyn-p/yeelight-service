@@ -5,39 +5,28 @@ https://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf
 
 import ip = require('ip');
 import dgram = require('dgram');
-import net = require('net');
 import {
 	IYeelight,
 	IYeelightDevice,
 	YeelightDeviceModelEnum,
 	YeelightSupportedMethodsEnum,
 	YeelightPowerState,
-	YeelightSupportedPropertiesEnum,
-	YeelightEffect,
+	YeelightColorModeEnum,
 } from './yeelight.interface';
 import { Socket } from 'dgram';
-import { YeelightMethods } from './yeelight.methods';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
+import { YeelightDevice } from './device.class';
 
 export class YeelightService implements IYeelight {
 	private readonly socket: Socket = dgram.createSocket('udp4');
-	private readonly options: {
-		port: number;
-		multicastAddr: string;
-		discoveryMsg: string;
-	} = {
-		port: 1982,
-		multicastAddr: '239.255.255.250',
-		discoveryMsg: 'M-SEARCH * HTTP/1.1\r\nMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n',
-	};
+	private readonly options: { port: number; multicastAddr: string; discoveryMsg: string; } = { port: 1982, multicastAddr: '239.255.255.250', discoveryMsg: 'M-SEARCH * HTTP/1.1\r\nMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n' };
+	public devices: BehaviorSubject<IYeelightDevice[]> = new BehaviorSubject<IYeelightDevice[]>([]);
 
-	public devices: BehaviorSubject<BehaviorSubject<IYeelightDevice>[]> = new BehaviorSubject<BehaviorSubject<IYeelightDevice>[]>([]);
-
-	constructor(private readonly yeelightMethods: YeelightMethods = new YeelightMethods()) {
+	constructor() {
 		this.listen();
 
-		this.socket.on('message', (message, address) => {
+		this.socket.on('message', (message: Buffer, address: dgram.RemoteInfo) => {
 			if (ip.address() === address.address) {
 				return;
 			}
@@ -46,217 +35,217 @@ export class YeelightService implements IYeelight {
 		});
 	}
 
+	public getDeviceByName(name: string): Observable<IYeelightDevice> {
+		return this.devices.pipe(
+			map((devices: IYeelightDevice[]) => devices.find((device: IYeelightDevice) => device.name.value === name)),
+			filter((value: IYeelightDevice) => !!value),
+		);
+	}
+
+	public getDeviceByModel(model: string): Observable<IYeelightDevice> {
+		return this.devices.pipe(
+			map((devices: IYeelightDevice[]) => devices.find((device: IYeelightDevice) => device.model === model)),
+			filter((value: IYeelightDevice) => !!value),
+		);
+	}
+
+	public destroy(): void {
+		this.devices.value.forEach((device: IYeelightDevice) => {
+			device.destroy();
+		});
+		this.socket.disconnect();
+	}
+
 	private listen(): void {
 		try {
 			this.socket.bind(this.options.port, () => {
 				this.socket.setBroadcast(true);
 			});
 
-			this.sendMessage(this.options.discoveryMsg, this.options.multicastAddr);
+			const buffer: Buffer = Buffer.from(this.options.discoveryMsg);
+			this.socket.send(buffer, 0, buffer.length, this.options.port, this.options.multicastAddr);
 		} catch (ex) {
-			throw ex;
+			return;
 		}
-	}
-
-	private sendMessage(message: string, address: string): void {
-		const buffer = Buffer.from(message);
-		this.socket.send(buffer, 0, buffer.length, this.options.port, address, (err) => {
-			if (err) {
-				throw err;
-			}
-		});
 	}
 
 	private handleDiscovery(message: Buffer): void {
+		try {
+			message.toString().split('\r\n');
+		} catch(e) {
+			return; // not a valid discovery message
+		}
+
 		const headers: string[] = message.toString().split('\r\n');
-		const deviceTemp: ITemporaryDeviceObject = {};
 
-		headers.forEach((keyAndValue) => {
-			const separatedKayAndValue: string[] = keyAndValue.split(': ');
-			if (separatedKayAndValue.length < 2) {
-				return;
-			}
-
-			const key: string = separatedKayAndValue.shift().toLowerCase();
-			let value: any = separatedKayAndValue.join(':');
-
-			switch (key) {
-				case 'location':
-					const partedLocation: string[] = value.split(':');
-					deviceTemp.host = partedLocation[1].replace('//', '');
-					deviceTemp.port = Number(partedLocation[2]);
-					break;
-				case 'support':
-					value = value.split(' ');
-					break;
-				case 'rgb':
-					value = `#${value.toString(16)}`;
-					break;
-				case 'ct':
-				case 'hue':
-				case 'sat':
-				case 'bright':
-				case 'color_mode':
-					value = Number(value);
-					break;
-				default:
-					break;
-			}
-
-			deviceTemp[key] = value;
-		});
-
-		const device: IYeelightDevice = {
-			connected: new BehaviorSubject<boolean>(true),
-			socket: new net.Socket(),
-			location: deviceTemp.location,
-			host: deviceTemp.host,
-			port: deviceTemp.port,
-			id: deviceTemp.id,
-			model: deviceTemp.model,
-			supportedMethods: deviceTemp.support,
-			get: {
-				name: new BehaviorSubject<string>(deviceTemp.name),
-				power: new BehaviorSubject<YeelightPowerState>(deviceTemp.power),
-				brightness: new BehaviorSubject<number>(deviceTemp.bright),
-				colorTemperature: new BehaviorSubject<number>(deviceTemp.ct),
-				rgb: new BehaviorSubject<string>(deviceTemp.rgb),
-				hue: new BehaviorSubject<number>(deviceTemp.hue),
-				saturation: new BehaviorSubject<number>(deviceTemp.sat),
-				colorMode: new BehaviorSubject<number>(deviceTemp.color_mode),
-			},
-			set: {
-				name: undefined,
-				asDefault: undefined,
-				power: undefined,
-				colorTemperature: undefined,
-				rgb: undefined,
-				hsv: undefined,
-				brightness: undefined,
-			},
-			togglePower: undefined,
-			adjust: {
-				brightness: undefined,
-				temperature: undefined,
-				color: undefined,
-			},
-		};
-
-		device.set = {
-			name: (name: string) => this.yeelightMethods.setName(device, name),
-			asDefault: () => this.yeelightMethods.setDefault(device),
-			power: (powerState: YeelightPowerState, effect: YeelightEffect, duration: number) => this.yeelightMethods.setPower(device, powerState, effect, duration),
-			colorTemperature: (colorTemperature: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setTemperature(device, colorTemperature, effect, duration),
-			rgb: (rgb: string | number | number[], effect: YeelightEffect, duration: number) => this.yeelightMethods.setRgb(device, rgb, effect, duration),
-			hsv: (hue: number, saturation: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setHsv(device, hue, saturation, effect, duration),
-			brightness: (brightness: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, brightness, effect, duration),
-		};
-
-		device.togglePower = () => this.yeelightMethods.toggle(device);
-
-		device.adjust = {
-			brightness: (difference: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, difference, effect, duration),
-			temperature: (difference: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, difference, effect, duration),
-			color: (difference: number, effect: YeelightEffect, duration: number) => this.yeelightMethods.setBrightness(device, difference, effect, duration),
-		};
-
-		const deviceIndex: number = this.devices?.value.findIndex((registeredDevice: BehaviorSubject<IYeelightDevice>) => registeredDevice.value.id === device.id,);
-
-		if (deviceIndex >= 0) {
+		const host: string = this.getHostFromHeaders(headers);
+		const port: number = this.getPortFromHeaders(headers);
+		if (!host || !port) {
 			return;
 		}
 
-		device.socket.connect(device.port, device.host, () => {
-			device.connected.next(true);
-		});
+		const device: IYeelightDevice = new YeelightDevice(host, port);
+		device.id = this.getIdFromHeaders(headers);
+		device.supportedMethods = this.getSupportedMethodsFromHeaders(headers);
+		device.model = this.getModelFromHeaders(headers);
+		device.brightness.next(this.getBrightnessFromHeaders(headers));
+		device.colorMode.next(this.getColorModeFromHeaders(headers));
+		device.colorTemperature.next(this.getColorTemperatureFromHeaders(headers));
+		device.hue.next(this.getHueFromHeaders(headers));
+		device.rgb.next(this.getRgbFromHeaders(headers));
+		device.saturation.next(this.getSaturationFromHeaders(headers));
+		device.name.next(this.getNameFromHeaders(headers));
+		device.power.next(this.getPowerFromHeaders(headers));
 
-		const deviceBehaviorSubject = new BehaviorSubject<IYeelightDevice>(device);
-		this.devices.next([...this.devices.value, deviceBehaviorSubject]);
+		const deviceIndex: number = this.devices?.value.findIndex((registeredDevice: IYeelightDevice) => registeredDevice.id === device.id,);
 
-		device.socket.on('data', (socketMessage: Buffer) => {
-			const stringJsons: string[] = socketMessage.toString().split(/\r?\n/).filter(Boolean);
+		if (deviceIndex >= 0) {
+			this.devices.value[deviceIndex] = device;
+			return;
+		}
 
-			stringJsons.forEach((stringJson) => {
-				try {
-					JSON.parse(stringJson);
-				} catch (e) {
-					return; // not a JSON object, continue
-				}
-
-				const data: { method: string; params?: any } = JSON.parse(stringJson);
-
-				if (data.method !== 'props') {
-					return;
-				}
-
-				for (const param in data.params) {
-					if (param) {
-						const value: string = data.params[param];
-
-						switch (param) {
-							case YeelightSupportedPropertiesEnum.power:
-								device.get.power.next(value as YeelightPowerState);
-								break;
-							case YeelightSupportedPropertiesEnum.brightness:
-								device.get.brightness.next(Number(value));
-								break;
-							case YeelightSupportedPropertiesEnum.colorTemperature:
-								device.get.colorTemperature.next(Number(value));
-								break;
-							case YeelightSupportedPropertiesEnum.rgb:
-								device.get.rgb.next(`#${Number(value).toString(16)}`);
-								break;
-							case YeelightSupportedPropertiesEnum.hue:
-								device.get.hue.next(Number(value));
-								break;
-							case YeelightSupportedPropertiesEnum.saturation:
-								device.get.saturation.next(Number(value));
-								break;
-							case YeelightSupportedPropertiesEnum.colorMode:
-								device.get.colorMode.next(Number(value));
-								break;
-							case YeelightSupportedPropertiesEnum.name:
-								device.get.name.next(value);
-								break;
-							default:
-								break;
-						}
-					}
-				}
-
-				deviceBehaviorSubject.next(device);
-			});
-		});
+		this.devices.next([...this.devices.value, device]);
 	}
 
-	public getDeviceByName(name: string): Observable<BehaviorSubject<IYeelightDevice>> {
-		return this.devices.pipe(
-			map((devices) => devices.find((device) => device.value.get.name.value === name)),
-			filter((value) => !!value),
-		);
+	private splitHeader(header: string): { key: string; value: string } {
+		const separatedKayAndValue: string[] = header.split(': ');
+		if (separatedKayAndValue.length < 2) {
+			return;
+		}
+		const key: string = separatedKayAndValue.shift().toLowerCase();
+		const value: any = separatedKayAndValue.join(':');
+
+		return { key, value };
 	}
 
-	public getDeviceByModel(model: string): Observable<BehaviorSubject<IYeelightDevice>> {
-		return this.devices.pipe(
-			map((devices) => devices.find((device) => device.value.model === model)),
-			filter((value) => !!value),
-		);
+	private getFromHeaders(parameter: string, headers: string[]): { key: string; value: string } {
+		const header: string = headers.find((singleHeader: string) => singleHeader.indexOf(`${ parameter }:`) >= 0);
+		const keyAndValue: { key: string; value: string } = this.splitHeader(header);
+		return keyAndValue;
 	}
-}
 
-interface ITemporaryDeviceObject {
-	location?: string;
-	host?: string;
-	port?: number;
-	id?: string;
-	model?: YeelightDeviceModelEnum;
-	support?: YeelightSupportedMethodsEnum[];
-	power?: YeelightPowerState;
-	bright?: number;
-	color_mode?: number;
-	ct?: number;
-	rgb?: string;
-	hue?: number;
-	sat?: number;
-	name?: string;
+	private getHostFromHeaders(headers: string[]): string {
+		const location: { key: string; value: string } = this.getFromHeaders('Location', headers);
+		if (!location?.value) {
+			return;
+		}
+
+		const partedLocation: string[] = location.value.split(':');
+		if (partedLocation.length < 2) {
+			return;
+		}
+		return partedLocation[1].replace('//', '');
+	}
+
+	private getPortFromHeaders(headers: string[]): number {
+		const location: { key: string; value: string } = this.getFromHeaders('Location', headers);
+		if (!location?.value) {
+			return;
+		}
+
+		const partedLocation: string[] = location.value.split(':');
+		if (partedLocation.length < 3) {
+			return;
+		}
+		return Number(partedLocation[2]);
+	}
+
+	private getIdFromHeaders(headers: string[]): string {
+		const id: { key: string; value: string } = this.getFromHeaders('id', headers);
+		if (!id?.value) {
+			return;
+		}
+
+		return id.value;
+	}
+
+	private getModelFromHeaders(headers: string[]): YeelightDeviceModelEnum {
+		const model: { key: string; value: string } = this.getFromHeaders('model', headers);
+		if (!model?.value) {
+			return;
+		}
+
+		return model.value as YeelightDeviceModelEnum;
+	}
+
+	private getNameFromHeaders(headers: string[]): string {
+		const name: { key: string; value: string } = this.getFromHeaders('name', headers);
+		if (!name?.value) {
+			return;
+		}
+
+		return name.value;
+	}
+
+	private getPowerFromHeaders(headers: string[]): YeelightPowerState {
+		const power: { key: string; value: string } = this.getFromHeaders('power', headers);
+		if (!power?.value || (power.value !== 'on' && power.value !== 'off')) {
+			return;
+		}
+
+		return power.value;
+	}
+
+	private getSupportedMethodsFromHeaders(headers: string[]): YeelightSupportedMethodsEnum[] {
+		const support: { key: string; value: string } = this.getFromHeaders('support', headers);
+		if (!support?.value) {
+			return;
+		}
+		const supportedMethods: YeelightSupportedMethodsEnum[] = support.value.split(' ') as YeelightSupportedMethodsEnum[];
+		return supportedMethods;
+	}
+
+	private getBrightnessFromHeaders(headers: string[]): number {
+		const brightness: { key: string; value: string } = this.getFromHeaders('bright', headers);
+		if (!brightness?.value) {
+			return;
+		}
+
+		return Number(brightness.value);
+	}
+
+	private getColorModeFromHeaders(headers: string[]): YeelightColorModeEnum {
+		const colorMode: { key: string; value: string } = this.getFromHeaders('color_mode', headers);
+		if (!colorMode?.value || !Object.values(YeelightColorModeEnum).includes(colorMode.value)) {
+			return;
+		}
+
+		return Number(colorMode.value);
+	}
+
+	private getColorTemperatureFromHeaders(headers: string[]): number {
+		const colorTemperature: { key: string; value: string } = this.getFromHeaders('ct', headers);
+		if (!colorTemperature?.value) {
+			return;
+		}
+
+		return Number(colorTemperature.value);
+	}
+
+	private getHueFromHeaders(headers: string[]): number {
+		const hue: { key: string; value: string } = this.getFromHeaders('hue', headers);
+		if (!hue?.value) {
+			return;
+		}
+
+		return Number(hue.value);
+	}
+
+	private getRgbFromHeaders(headers: string[]): string {
+		const rgb: { key: string; value: string } = this.getFromHeaders('rgb', headers);
+		if (!rgb?.value) {
+			return;
+		}
+
+		return `#${ Number(rgb.value).toString(16) }`;
+	}
+
+	private getSaturationFromHeaders(headers: string[]): number {
+		const saturation: { key: string; value: string } = this.getFromHeaders('sat', headers);
+		if (!saturation?.value) {
+			return;
+		}
+
+		return Number(saturation.value);
+	}
 }
