@@ -1,6 +1,6 @@
 {
 	"name": "yeelight-service",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Node Yeelight service. ",
 	"main": "lib/yeelight.service.js",
 	"types": "lib/yeelight.interface.d.ts",
@@ -8,11 +8,7 @@
 		"build": "tsc",
 		"start": "tsc && node lib/index.js",
 		"lint": "tslint -p tsconfig.json",
-		"prepare": "npm run build",
-		"preversion": "npm run lint",
-		"version": "git add -A src",
-		"postversion": "git push && git push --tags",
-		"final": "npm run prepare && npm run preversion && npm run version && npm run postversion"
+		"version": "npm run build && npm run lint"
 	},
 	"files": [
 		"lib/**/*"
