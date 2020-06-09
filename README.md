@@ -24,6 +24,7 @@
 	* [Get device by model](#get-device-by-model)
 	* [Subscribing to device property](#subscribing-to-device-property)
 	* [Changing property of device](#changing-property-of-device)
+	* [Typings](#typings)
 * [Contributing](#contributing)
 * [License](#license)
 * [Contact](#contact)
@@ -50,9 +51,10 @@ const yeelightService = new YeelightService();
 ```
 
 ### Subscribing to devices
-This function subscribes to all devices connected to current WiFi. Event will be fired each time, a new device is connected.
+This function subscribes to all devices connected to current WiFi. Event will be executed each time, a new device is connected.
 ```typescript
 yeelightService.devices.subscribe((devices) => {
+    // executed each time device is connected
 	// do something with devices
 });
 ```
@@ -61,6 +63,7 @@ yeelightService.devices.subscribe((devices) => {
 This function gets device by name. If there are multiple devices with given name, only the first one will be returned.
 ```typescript
 yeelightService.getDeviceByName('deviceName').subscribe((device) => {
+    // executed when device will be found
 	// do something with device
 });
 ```
@@ -69,6 +72,7 @@ yeelightService.getDeviceByName('deviceName').subscribe((device) => {
 This function gets device by model. If there are multiple devices with given model, only the first one will be returned.
 ```typescript
 yeelightService.getDeviceByModel('lamp1').subscribe((device) => {
+    // executed when device will be found
 	// do something with device
 });
 ```
@@ -78,7 +82,8 @@ You can subscribe to device property (e.g. subscribe to power state)
 ```typescript
 yeelightService.getDeviceByModel('lamp1').subscribe((device) => {
 	device.power.subscribe((powerState) => {
-		// this code will be executed each time power state of the device changes
+        // executed each time power state change
+		// do something with power state
 	});
 });
 ```
@@ -86,9 +91,27 @@ Or you can get power state just once
 ```typescript
 yeelightService.getDeviceByModel('lamp1').subscribe((device) => {
 	const power = device.power.value;
+    // do something with power state
 });
 ```
-If you want to observe more than one property, do it in rxjs-way.
+If you want to observe more than one property, do it in RXJS-way. For example, if you want to be notified each time when `connection status`, `power state` OR `brightness` change, you can use RXJS `combineLatest`.
+
+```typescript
+yeelightService.getDeviceByModel('lamp1').subscribe((device) => {
+	combineLatest(
+		device.connected,
+		device.power,
+		device.brightness
+	).pipe(
+		map(([connected, power, brightness]) => {
+			return { connected, power, brightness };
+		})
+	).subscribe((data) => {
+        // executed each time `connected`, `power` or `brightness` change
+		// do something with data
+	});
+});
+``` 
 
 ### Changing property of device
 Every function changing any device property returns promise object with operation status. 
@@ -97,6 +120,36 @@ Every function changing any device property returns promise object with operatio
 yeelightService.getDeviceByModel('lamp1').subscribe((device) => {
 	device.setPower('on').then((result) => {
 		// do something with result
+	});
+});
+```
+
+### Typings
+File with types: `'yeelight-service/lib/yeelight.interface'`
+
+Example (log to console after changing power state failed):
+```typescript
+import { YeelightService } from 'yeelight-service';
+import {
+	IYeelight,
+	IYeelightDevice,
+	IYeelightMethodResponse,
+	YeelightMethodStatusEnum
+} from 'yeelight-service/lib/yeelight.interface';
+
+const yeelightService: IYeelight = new YeelightService();
+yeelightService.getDeviceByModel('lamp1').subscribe((device: IYeelightDevice) => {
+	device.setPower('on').then((result: IYeelightMethodResponse) => {
+		if (result.status === YeelightMethodStatusEnum.OK) {
+			return;
+		}
+
+		if (result.errorMessage) {
+			console.log(result.errorMessage);
+			return;
+		}
+
+		console.log(`Unexpected error occured. Error code: ${ result.status }`);
 	});
 });
 ```
