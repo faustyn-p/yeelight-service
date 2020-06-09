@@ -2,7 +2,8 @@
 	"name": "yeelight-service",
 	"version": "0.0.6",
 	"description": "Node Yeelight service.",
-	"main": "./lib/yeelight.service",
+	"main": "./lib/yeelight.service.js",
+	"types": "./lib/yeelight.interface.ts",
 	"scripts": {
 		"build": "tsc",
 		"start": "tsc && node lib/yeelight.service.js",
