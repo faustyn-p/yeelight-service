@@ -3,7 +3,7 @@
 	"version": "0.0.6",
 	"description": "Node Yeelight service.",
 	"main": "./lib/yeelight.service.js",
-	"types": "./lib/yeelight.interface.ts",
+	"types": "./lib/yeelight.interface",
 	"scripts": {
 		"build": "tsc",
 		"start": "tsc && node lib/yeelight.service.js",
@@ -11,7 +11,7 @@
 		"version": "npm run build && npm run lint"
 	},
 	"files": [
-		"lib/*"
+		"./lib/"
 	],
 	"repository": {
 		"type": "git",

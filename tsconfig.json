@@ -3,10 +3,13 @@
 		"target": "es5",
 		"module": "commonjs",
 		"declaration": true,
-		"outDir": "./lib",
+		"outDir": "./lib/",
 		"strictNullChecks": false,
 		"strict": false
 	},
+	"files": [
+		"./src/yeelight.service.ts"
+	],
 	"include": [
 		"src"
 	],
