@@ -1,17 +1,17 @@
 {
 	"name": "yeelight-service",
-	"version": "1.0.4",
+	"version": "1.0.0",
 	"description": "Node Yeelight service. ",
 	"main": "lib/yeelight.service.js",
 	"types": "lib/yeelight.interface.d.ts",
 	"scripts": {
 		"build": "tsc",
-		"start": "tsc && node lib/index.js",
+		"start": "tsc && node lib/yeelight.service.js",
 		"lint": "tslint -p tsconfig.json",
 		"version": "npm run build && npm run lint"
 	},
 	"files": [
-		"lib/**/*"
+		"lib/*"
 	],
 	"repository": {
 		"type": "git",
