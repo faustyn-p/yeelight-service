@@ -371,7 +371,7 @@ export class YeelightDevice implements IYeelightDevice {
 
 			const data: { method: string; params?: any } = JSON.parse(stringJson);
 
-			if (data.method !== 'props') {
+			if (data.method === 'props') {
 				this.handleProperties(data);
 				return;
 			}
