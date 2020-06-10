@@ -146,6 +146,9 @@ export interface IYeelightDevice {
     }) => Promise<IYeelightMethodResponse>;
 }
 export interface IYeelight {
+    /**
+     * List of found Yeelight devices.
+     */
     devices: BehaviorSubject<IYeelightDevice[]>;
     /**
      * Get device with given name. If there are two or more devices with given name, this function will return only first one.
@@ -163,6 +166,10 @@ export interface IYeelight {
      * Behaviour subject of device
      */
     getDeviceByModel: (model: string) => Observable<IYeelightDevice>;
+    /**
+     * Destroy service by closing all socket connections.
+     */
+    destroy: () => void;
 }
 export interface IYeelightMethodResponse {
     /**
