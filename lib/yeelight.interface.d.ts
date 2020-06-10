@@ -94,7 +94,7 @@ export interface IYeelightDevice {
     setHsv: (hue: number, saturation: number, effect?: YeelightEffect, duration?: number) => Promise<IYeelightMethodResponse>;
     /**
      * Set brightness of the device
-     * @param {number} brightness Number in the range from 0 to 359 (percent)
+     * @param {number} brightness Number in the range from 0 to 100 (percent)
      * @param {YeelightEffect} effect Optional parameter with effect - `smooth` or `sudden`
      * @param {number} duration Optional parameter with duration (in ms)
      * @returns {Promise<IYeelightMethodResponse>} Response with status code (and an error if occured)
