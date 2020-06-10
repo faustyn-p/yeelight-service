@@ -24,7 +24,8 @@
 	* [Get device by model](#get-device-by-model)
 	* [Subscribing to device property](#subscribing-to-device-property)
 	* [Changing property of device](#changing-property-of-device)
-	* [Typings](#typings)
+* [Types](#types)
+* [Performance](#performance)
 * [Contributing](#contributing)
 * [License](#license)
 * [Contact](#contact)
@@ -124,7 +125,7 @@ yeelightService.getDeviceByModel('lamp1').subscribe((device) => {
 });
 ```
 
-### Typings
+## Types
 File with types: `'yeelight-service/lib/yeelight.interface'`
 
 Example (log to console after changing power state failed):
@@ -154,8 +155,33 @@ yeelightService.getDeviceByModel('lamp1').subscribe((device: IYeelightDevice) =>
 });
 ```
 
-## Contributing
+## Performance
+If you want to terminate the service, please use `destroy` function. It will close all devices sockets, as well as main service socket itself.
+```typescript
+yeelightService.destroy();
+```
 
+You can close connection of single device, by using `destroy` function on device. Example:
+```typescript
+yeelightService.devices.subscribe((devices) => {
+    devices.forEach(() => {
+        const deviceName = device.name.value;
+        const deviceConnected = device.connected.value;
+
+        if (!deviceConnected) {
+            return;
+        }
+
+        if (deviceName !== 'myDevice') {
+            device.destroy();
+        }
+
+        // do something with device `myDevice` knowing, that every other device is disconnected from socket
+    });
+});
+```
+
+## Contributing
 All contributions are appreciated. To make contribution:
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/featureName`)
@@ -163,8 +189,9 @@ All contributions are appreciated. To make contribution:
 4. Push to the Branch (`git push origin feature/featureName`)
 5. Open a Pull Request
 
+## Credits
+* [Dawid Chróścielski](https://github.com/Chroscielski) - Code Review, suggestions about performance issues and code structure.
 
 ## License
-
 This package is distributed under the MIT License.
 
