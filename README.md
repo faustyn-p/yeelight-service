@@ -15,7 +15,6 @@
 </p>
 
 ## Table of Contents
-
 * [Getting Started](#getting-started)
 * [Usage and examples](#usage)
 	* [Import YeelightService](#import-yeelightservice)
@@ -26,12 +25,13 @@
 	* [Changing property of device](#changing-property-of-device)
 * [Types](#types)
 * [Performance](#performance)
+* [Methods](#methods)
+    
 * [Contributing](#contributing)
 * [License](#license)
 * [Contact](#contact)
 
 ## Getting Started
-
 Install package
 ```sh
 npm install yeelight-service
@@ -126,7 +126,7 @@ yeelightService.getDeviceByModel('lamp1').subscribe((device) => {
 ```
 
 ## Types
-File with types: `'yeelight-service/lib/yeelight.interface'`
+Interface file: `'yeelight-service/lib/yeelight.interface'`
 
 Example (log to console after changing power state failed):
 ```typescript
@@ -180,6 +180,11 @@ yeelightService.devices.subscribe((devices) => {
     });
 });
 ```
+
+## Methods
+Not all of methods from official Yeelight API are supported. If you need method that is not on the list to be part of the package, please create [github issue](https://github.com/faustyn-p/yeelight-service/issues).
+
+
 
 ## Contributing
 All contributions are appreciated. To make contribution:
