@@ -27,6 +27,7 @@ export class YeelightDevice implements IYeelightDevice {
 		this.socket.connect(port, host, () => {
 			this.connected.next(true);
 		});
+		this.socket.setKeepAlive(true, 60000);
 
 		this.socket.on('data', (socketMessage: Buffer) => {
 			this.handleSocketMessage(socketMessage);
