@@ -104,6 +104,7 @@ export class YeelightService implements IYeelight {
 			return;
 		}
 
+		device.connected.next(true);
 		this.devices.next([...this.devices.value, device]);
 	}
 
