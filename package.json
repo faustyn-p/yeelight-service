@@ -4,9 +4,6 @@
 	"description": "Node Yeelight service.",
 	"main": "lib/yeelight.service.js",
 	"types": "lib/yeelight.service",
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com/"
-	},
 	"scripts": {
 		"build": "tsc",
 		"start": "tsc && node lib/yeelight.service.js",
