@@ -1,6 +1,6 @@
 {
 	"name": "yeelight-service",
-	"version": "0.0.7",
+	"version": "1.0.0",
 	"description": "Node Yeelight service.",
 	"main": "lib/yeelight.service.js",
 	"types": "lib/yeelight.service",
