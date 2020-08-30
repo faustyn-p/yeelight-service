@@ -11,6 +11,8 @@
     <a href="https://github.com/faustyn-p/yeelight-service/issues">Report Bug</a>
     ·
     <a href="https://github.com/faustyn-p/yeelight-service/issues">Request Feature</a>
+    .
+    <a href="https://github.com/faustyn-p/yeelight-service/wiki">Wiki</a>
   </p>
 </p>
 
