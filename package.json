@@ -18,7 +18,7 @@
 		"url": "git+https://github.com/faustyn-p/yeelight-service.git"
 	},
 	"keywords": [
-		"Yeelight"
+		"Yeelight", "RxJS", "Node", "SmartHome", "Promise", "Light", "Bulb", "TypeScript"
 	],
 	"author": "Faustyn Piechowiak",
 	"license": "MIT",
