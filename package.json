@@ -1,6 +1,6 @@
 {
 	"name": "yeelight-service",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Node Yeelight service.",
 	"main": "lib/yeelight.service.js",
 	"types": "lib/yeelight.service",
@@ -18,7 +18,14 @@
 		"url": "git+https://github.com/faustyn-p/yeelight-service.git"
 	},
 	"keywords": [
-		"Yeelight", "RxJS", "Node", "SmartHome", "Promise", "Light", "Bulb", "TypeScript"
+		"Yeelight",
+		"RxJS",
+		"Node",
+		"SmartHome",
+		"Promise",
+		"Light",
+		"Bulb",
+		"TypeScript"
 	],
 	"author": "Faustyn Piechowiak",
 	"license": "MIT",

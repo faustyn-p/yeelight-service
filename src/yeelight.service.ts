@@ -53,7 +53,7 @@ export class YeelightService implements IYeelight {
 		this.devices.value.forEach((device: IYeelightDevice) => {
 			device.destroy();
 		});
-		this.socket.disconnect();
+		this.socket.close();
 	}
 
 	private listen(): void {
